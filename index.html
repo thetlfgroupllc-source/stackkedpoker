@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StackedPoker</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-suits">♠<span class="red">♥</span></span>
+      <div>
+        <div class="logo-name">Stacked</div>
+        <div class="logo-sub">poker trainer</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="arcade">Arcade <span class="nav-tag">game</span></button>
+      <button class="nav-btn" data-view="preflop">Preflop Trainer <span class="nav-tag">cash</span></button>
+      <button class="nav-btn" data-view="pushfold">Push/Fold Trainer <span class="nav-tag">mtt</span></button>
+      <button class="nav-btn" data-view="odds">Pot Odds Quiz</button>
+      <button class="nav-btn" data-view="equity">Equity Lab</button>
+      <button class="nav-btn" data-view="ranges">Range Charts</button>
+      <button class="nav-btn" data-view="tracker">Session Tracker</button>
+      <button class="nav-btn" data-view="cheatsheet">Cheat Sheet</button>
+    </nav>
+    <div class="sidebar-foot" id="sidebarStats"></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ ARCADE ============ -->
+    <section class="view active" id="view-arcade">
+      <header class="view-head">
+        <h1>Arcade</h1>
+        <p>Twenty rapid-fire decisions — preflop opens, short-stack jams, pot odds. Score on accuracy and speed, then stack your run against the world and your friends.</p>
+      </header>
+
+      <!-- home -->
+      <div id="arcHome">
+        <div class="arc-modes">
+          <div class="arc-mode-card daily">
+            <div class="amc-tag">Daily Challenge</div>
+            <h3 id="arcDailyTitle">Today's 20 hands</h3>
+            <p>Everyone in the world gets the <b>same 20 questions today</b>, generated from the date. Same test, fair fight — compare scores with anyone.</p>
+            <button class="btn btn-raise" id="arcPlayDaily">Play today's challenge</button>
+            <div class="amc-best" id="arcDailyBest"></div>
+          </div>
+          <div class="arc-mode-card">
+            <div class="amc-tag">Blitz</div>
+            <h3>Random 20</h3>
+            <p>A fresh random gauntlet every time. Warm up, grind your personal best, chase a perfect run.</p>
+            <button class="btn btn-next" style="margin:0" id="arcPlayBlitz">Play blitz</button>
+            <div class="amc-best" id="arcBlitzBest"></div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="panel">
+            <h3>Personal bests</h3>
+            <div id="arcBests"></div>
+          </div>
+          <div class="panel">
+            <h3>Friends leaderboard</h3>
+            <p class="arc-hint">After a run you get a share code. Swap codes with friends and paste theirs here — no accounts, nothing leaves your machine.</p>
+            <div class="arc-addcode">
+              <input type="text" id="arcCodeIn" placeholder="Paste a friend's code (STK1.…)">
+              <button class="btn btn-next" style="margin:0;flex:0 0 auto" id="arcCodeAdd">Add</button>
+            </div>
+            <div class="arc-code-err" id="arcCodeErr"></div>
+            <div id="arcFriends"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- playing -->
+      <div id="arcPlay" class="hidden">
+        <div class="arc-hud">
+          <div class="arc-hud-cell"><span id="arcQNum">1</span>/20</div>
+          <div class="arc-timer-track"><div class="arc-timer-fill" id="arcTimer"></div></div>
+          <div class="arc-hud-cell arc-hud-score" id="arcScore">0</div>
+        </div>
+        <div class="panel arc-question">
+          <div class="arc-q-kind" id="arcQKind"></div>
+          <div class="arc-q-title" id="arcQTitle"></div>
+          <div class="arc-q-cards" id="arcQCards"></div>
+          <div class="arc-q-sub" id="arcQSub"></div>
+          <div class="answer-row" id="arcAnswers"></div>
+          <div class="arc-flash" id="arcFlash"></div>
+        </div>
+        <button class="btn btn-ghost" id="arcQuit">Abandon run</button>
+      </div>
+
+      <!-- results -->
+      <div id="arcResults" class="hidden">
+        <div class="panel arc-final">
+          <div class="arc-final-label" id="arcResMode">Daily Challenge</div>
+          <div class="arc-final-score" id="arcResScore">0</div>
+          <div class="arc-final-stats" id="arcResStats"></div>
+          <div class="arc-pct-wrap">
+            <div class="arc-pct-track"><div class="arc-pct-fill" id="arcPctFill"></div></div>
+            <div class="arc-pct-text" id="arcPctText"></div>
+            <div class="arc-hint">Estimated against a benchmark distribution of player scores — this app has no server, so "the world" is a statistical field, not a live feed.</div>
+          </div>
+          <div class="arc-share">
+            <label class="arc-name-label">Your name <input type="text" id="arcName" maxlength="16" placeholder="e.g. Trav"></label>
+            <div class="arc-code-row">
+              <code id="arcShareCode"></code>
+              <button class="btn btn-next" style="margin:0;flex:0 0 auto" id="arcCopy">Copy code</button>
+            </div>
+            <div class="arc-hint">Send this to friends — they paste it on the Arcade home screen to add you to their leaderboard.</div>
+          </div>
+          <div class="answer-row">
+            <button class="btn btn-raise" id="arcAgain">Play again</button>
+            <button class="btn btn-next" style="margin:0" id="arcHomeBtn">Back to arcade</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Hand-by-hand review</h3>
+          <div id="arcReview"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PREFLOP TRAINER ============ -->
+    <section class="view" id="view-preflop">
+      <header class="view-head">
+        <h1>Preflop Trainer</h1>
+        <p>6-max cash, 100bb, folded to you. Should you open-raise or fold?</p>
+      </header>
+      <div class="two-col">
+        <div class="panel quiz-panel">
+          <div class="table-felt" id="pfTable">
+            <div class="seat-ring" id="pfSeats"></div>
+            <div class="felt-center">
+              <div class="pf-position" id="pfPosition">—</div>
+              <div class="hole-cards" id="pfCards"></div>
+              <div class="pf-situation" id="pfSituation">Folded to you</div>
+            </div>
+          </div>
+          <div class="answer-row" id="pfAnswers">
+            <button class="btn btn-raise" data-answer="raise">Raise</button>
+            <button class="btn btn-fold" data-answer="fold">Fold</button>
+          </div>
+          <div class="feedback" id="pfFeedback"></div>
+          <button class="btn btn-next hidden" id="pfNext">Next hand →</button>
+        </div>
+        <div class="panel side-panel">
+          <h3>Your stats</h3>
+          <div class="stat-grid" id="pfStats"></div>
+          <h3 style="margin-top:16px">Position accuracy</h3>
+          <div class="pos-bars" id="pfPosStats"></div>
+          <button class="btn btn-ghost" id="pfReset">Reset stats</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PUSH/FOLD TRAINER ============ -->
+    <section class="view" id="view-pushfold">
+      <header class="view-head">
+        <h1>Push/Fold Trainer</h1>
+        <p>Tournament short-stack play, folded to you. Jam or fold? Based on Nash push/fold approximations (unopened pots, no antes).</p>
+      </header>
+      <div class="two-col">
+        <div class="panel quiz-panel">
+          <div class="table-felt">
+            <div class="seat-ring" id="phSeats"></div>
+            <div class="felt-center">
+              <div class="pf-position" id="phPosition">—</div>
+              <div class="hole-cards" id="phCards"></div>
+              <div class="pf-situation" id="phStack">— bb</div>
+            </div>
+          </div>
+          <div class="answer-row">
+            <button class="btn btn-raise" data-answer="push">All-in</button>
+            <button class="btn btn-fold" data-answer="fold">Fold</button>
+          </div>
+          <div class="feedback" id="phFeedback"></div>
+          <button class="btn btn-next hidden" id="phNext">Next hand →</button>
+        </div>
+        <div class="panel side-panel">
+          <h3>Your stats</h3>
+          <div class="stat-grid" id="phStats"></div>
+          <h3 style="margin-top:16px">Push range for this spot</h3>
+          <div class="mini-grid-wrap"><div class="range-grid mini" id="phGrid"></div></div>
+          <button class="btn btn-ghost" id="phReset">Reset stats</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ POT ODDS QUIZ ============ -->
+    <section class="view" id="view-odds">
+      <header class="view-head">
+        <h1>Pot Odds Quiz</h1>
+        <p>You're on a draw facing a bet. Compare your equity to the price — call or fold?</p>
+      </header>
+      <div class="two-col">
+        <div class="panel quiz-panel">
+          <div class="odds-scenario" id="oddsScenario"></div>
+          <div class="answer-row">
+            <button class="btn btn-raise" data-answer="call">Call</button>
+            <button class="btn btn-fold" data-answer="fold">Fold</button>
+          </div>
+          <div class="feedback" id="oddsFeedback"></div>
+          <button class="btn btn-next hidden" id="oddsNext">Next spot →</button>
+        </div>
+        <div class="panel side-panel">
+          <h3>Your stats</h3>
+          <div class="stat-grid" id="oddsStats"></div>
+          <h3 style="margin-top:16px">Quick reference</h3>
+          <table class="ref-table">
+            <tr><th>Bet size</th><th>Equity needed</th></tr>
+            <tr><td>⅓ pot</td><td>20%</td></tr>
+            <tr><td>½ pot</td><td>25%</td></tr>
+            <tr><td>⅔ pot</td><td>28.5%</td></tr>
+            <tr><td>¾ pot</td><td>30%</td></tr>
+            <tr><td>Full pot</td><td>33%</td></tr>
+            <tr><td>1.5× pot</td><td>37.5%</td></tr>
+          </table>
+          <button class="btn btn-ghost" id="oddsReset">Reset stats</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EQUITY LAB ============ -->
+    <section class="view" id="view-equity">
+      <header class="view-head">
+        <h1>Equity Lab</h1>
+        <p>Run any hand vs. hand matchup with Monte Carlo simulation. Build your intuition for common all-in spots.</p>
+      </header>
+      <div class="two-col">
+        <div class="panel">
+          <div class="eq-form">
+            <label>Your hand <input type="text" id="eqHero" placeholder="e.g. As Kh" value="As Kh"></label>
+            <label>Opponent <input type="text" id="eqVillain" placeholder="e.g. Qd Qc — or leave blank for random"></label>
+            <label>Board <input type="text" id="eqBoard" placeholder="0, 3, 4 or 5 cards, e.g. Ad 7s 2c"></label>
+            <button class="btn btn-raise" id="eqRun">Run 20,000 hands</button>
+          </div>
+          <div class="eq-error" id="eqError"></div>
+          <div class="eq-result hidden" id="eqResult">
+            <div class="eq-bar"><div class="eq-bar-hero" id="eqBarHero"></div><div class="eq-bar-tie" id="eqBarTie"></div></div>
+            <div class="eq-numbers">
+              <div><span class="eq-label">You</span><span class="eq-pct" id="eqHeroPct">—</span></div>
+              <div><span class="eq-label">Tie</span><span class="eq-pct" id="eqTiePct">—</span></div>
+              <div><span class="eq-label">Opponent</span><span class="eq-pct" id="eqVillPct">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel side-panel">
+          <h3>Classic matchups</h3>
+          <div class="presets" id="eqPresets"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RANGE CHARTS ============ -->
+    <section class="view" id="view-ranges">
+      <header class="view-head">
+        <h1>Range Charts</h1>
+        <p>Study the open-raise ranges the trainers test you on. 6-max cash, 100bb, first to act.</p>
+      </header>
+      <div class="panel">
+        <div class="range-tabs" id="rangeTabs"></div>
+        <div class="range-view">
+          <div class="range-grid" id="rangeGrid"></div>
+          <div class="range-info" id="rangeInfo"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SESSION TRACKER ============ -->
+    <section class="view" id="view-tracker">
+      <header class="view-head">
+        <h1>Session Tracker</h1>
+        <p>Log every session. The graph doesn't lie — your bankroll tells you what's working.</p>
+      </header>
+      <div class="panel">
+        <div class="tracker-summary" id="trkSummary"></div>
+      </div>
+      <div class="panel">
+        <h3>Bankroll — cumulative profit</h3>
+        <div id="trkChart" class="trk-chart"></div>
+      </div>
+      <div class="two-col">
+        <div class="panel">
+          <h3>Log a session</h3>
+          <form class="trk-form" id="trkForm">
+            <label>Date <input type="date" id="trkDate" required></label>
+            <label>Type
+              <select id="trkType">
+                <option value="cash">Cash game</option>
+                <option value="tournament">Tournament</option>
+              </select>
+            </label>
+            <label>Stakes / buy-in level <input type="text" id="trkStakes" placeholder="e.g. $1/$2 or $60 MTT" required></label>
+            <label>Buy-in total ($) <input type="number" id="trkBuyin" step="0.01" min="0" required></label>
+            <label>Cash-out total ($) <input type="number" id="trkCashout" step="0.01" min="0" required></label>
+            <label>Hours <input type="number" id="trkHours" step="0.25" min="0" required></label>
+            <label class="wide">Notes <input type="text" id="trkNotes" placeholder="key hands, mistakes, table type…"></label>
+            <button type="submit" class="btn btn-raise">Add session</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h3>Sessions</h3>
+          <div class="trk-table-wrap">
+            <table class="trk-table" id="trkTable"></table>
+          </div>
+          <div class="trk-actions">
+            <button class="btn btn-ghost" id="trkExport">Export JSON</button>
+            <button class="btn btn-ghost" id="trkImport">Import JSON</button>
+            <input type="file" id="trkImportFile" accept=".json" class="hidden">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHEAT SHEET ============ -->
+    <section class="view" id="view-cheatsheet">
+      <header class="view-head">
+        <h1>Cheat Sheet</h1>
+        <p>The fundamentals that win at small stakes. Read before every session until it's automatic.</p>
+      </header>
+      <div class="cheat-grid" id="cheatGrid"></div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/cards.js"></script>
+<script src="js/evaluator.js"></script>
+<script src="js/equity.js"></script>
+<script src="js/ranges.js"></script>
+<script src="js/pushfold.js"></script>
+<script src="js/preflop-trainer.js"></script>
+<script src="js/pushfold-trainer.js"></script>
+<script src="js/odds-quiz.js"></script>
+<script src="js/equity-lab.js"></script>
+<script src="js/range-viewer.js"></script>
+<script src="js/tracker.js"></script>
+<script src="js/challenge.js"></script>
+<script src="js/cheatsheet.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
