@@ -1,4 +1,4 @@
-# StackedPoker
+# StackkedPoker
 
 A local desktop training app for small-stakes cash games and tournaments.
 No install, no dependencies, no account — everything runs in your browser
@@ -12,6 +12,32 @@ Double-click `index.html`, or serve it locally:
 python3 -m http.server 4173
 # then open http://localhost:4173
 ```
+
+## Live version
+
+Hosted on GitHub Pages — open from any device, including your phone:
+
+**https://thetlfgroupllc-source.github.io/stackkedpoker/**
+
+Your stats and sessions live in each browser's localStorage, so they're private
+to that device and don't sync between phone and laptop.
+
+## Editing from your phone (no laptop)
+
+You can change this app from your phone using Claude Code on the web
+(needs a Claude Pro/Max/Team plan):
+
+1. Open the **Claude app** (iOS/Android) or **claude.ai/code**, and connect your
+   GitHub account (authorize the Claude GitHub App once).
+2. Pick the **stackkedpoker** repo and start a session.
+3. Describe the change in plain English (e.g. "make the pot-odds timer 20s").
+4. Claude edits the code and opens a **pull request** — review the diff, tap **Merge**.
+5. Merging to `main` triggers GitHub Pages; the live site updates in ~1 minute.
+
+**Keeping this machine in sync:** after merging anything from your phone, run
+`git pull` here before making further local edits, or the two copies drift apart.
+
+To push local changes the other way: `git add -A && git commit -m "..." && git push`.
 
 ## What's inside
 
