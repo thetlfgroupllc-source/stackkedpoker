@@ -202,9 +202,10 @@ const Challenge = (() => {
       else if (bi === i) b.classList.add('arc-wrong');
     });
     const flash = document.getElementById('arcFlash');
+    const cheer = ['KAPOW!', 'ZING!', 'BOOM!', 'WHEE!', 'NICE!'][Math.floor(Math.random() * 5)];
     flash.textContent = correct
-      ? `✓ +${pts}`
-      : (i === null ? `⏱ Time! It was ${q.options[q.correct]}.` : `✗ ${q.options[q.correct]} was right.`);
+      ? `${cheer} +${pts}`
+      : (i === null ? `SNOOZE! Too slow — it was ${q.options[q.correct]}.` : `BONK! ${q.options[q.correct]} was right.`);
     flash.className = 'arc-flash show ' + (correct ? 'good' : 'bad');
     document.getElementById('arcScore').textContent = run.score;
 

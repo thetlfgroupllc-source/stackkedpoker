@@ -117,7 +117,7 @@ const OddsQuiz = (() => {
     const fb = document.getElementById('oddsFeedback');
     fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
     fb.innerHTML = `
-      <div class="fb-title">${correct ? '✓ Correct' : '✗ Not this time'} — this is a ${shouldCall ? 'CALL' : 'FOLD'}</div>
+      <div class="fb-title">${correct ? 'ZING! Math wizard' : 'BONK! The math says otherwise'} — this is a ${shouldCall ? 'CALL' : 'FOLD'}</div>
       <div class="fb-detail">
         You call $${bet} to win $${pot + bet}, so you need <b>${reqPct}%</b> equity
         ($${bet} ÷ ($${pot} + $${bet} + $${bet})).<br>

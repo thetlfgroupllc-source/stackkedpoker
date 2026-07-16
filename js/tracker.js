@@ -83,19 +83,19 @@ const Tracker = (() => {
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative profit across sessions">
         ${ticks.map(t => `
           <line x1="${PAD_L}" x2="${W - PAD_R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"
-            stroke="${t === 0 ? '#443d28' : '#35301f'}" stroke-width="${t === 0 ? 1.5 : 1}"/>
+            stroke="${t === 0 ? '#c9b98e' : '#e7d9b4'}" stroke-width="${t === 0 ? 1.5 : 1}"/>
           <text x="${PAD_L - 8}" y="${(y(t) + 4).toFixed(1)}" text-anchor="end"
-            font-size="11" fill="#948c74" style="font-variant-numeric:tabular-nums">${fmt$(t)}</text>`).join('')}
-        <path d="${path}" fill="none" stroke="#d9a441" stroke-width="2" stroke-linejoin="round"/>
+            font-size="11" fill="#97865f" style="font-variant-numeric:tabular-nums">${fmt$(t)}</text>`).join('')}
+        <path d="${path}" fill="none" stroke="#4aa3ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
         ${pts.map((p, i) => `
-          <circle class="trk-pt" data-i="${i}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="3.5"
-            fill="#d9a441" stroke="#1e1b13" stroke-width="2"/>
+          <circle class="trk-pt" data-i="${i}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="4"
+            fill="#4aa3ff" stroke="#2b2016" stroke-width="2"/>
           <circle class="trk-hit" data-i="${i}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="12" fill="transparent"/>`).join('')}
-        <text x="${W - PAD_R}" y="${H - 8}" text-anchor="end" font-size="11" fill="#948c74">sessions →</text>
+        <text x="${W - PAD_R}" y="${H - 8}" text-anchor="end" font-size="11" fill="#97865f">sessions →</text>
         <g id="trkTip" style="display:none;pointer-events:none">
-          <rect id="trkTipBg" rx="6" fill="#292418" stroke="rgba(243,236,216,0.16)"/>
-          <text id="trkTipT1" font-size="11" fill="#cfc6ac"></text>
-          <text id="trkTipT2" font-size="13" font-weight="700" fill="#f3ecd8"></text>
+          <rect id="trkTipBg" rx="8" fill="#fffdf4" stroke="#2b2016" stroke-width="2"/>
+          <text id="trkTipT1" font-size="11" fill="#5c4d3a"></text>
+          <text id="trkTipT2" font-size="13" font-weight="700" fill="#2b2016"></text>
         </g>
       </svg>`;
 

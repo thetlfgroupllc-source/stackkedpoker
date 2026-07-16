@@ -257,7 +257,7 @@ const Meta = (() => {
             <div class="avatar-frame lg">${avatarSVG(a.id)}</div>
             <div class="rankup-unlock-text">New regular unlocked<br><b>${a.name}</b> — ${a.bio}</div>
           </div>`).join('')}
-        <button class="btn btn-raise" id="rankUpClose">Back to the grind</button>
+        <button class="btn btn-raise" id="rankUpClose">Let's gooo!</button>
       </div>`;
     overlay.classList.remove('hidden');
     suitRain(overlay);
@@ -267,10 +267,10 @@ const Meta = (() => {
     });
   }
 
-  // Confetti, card-room style: the four suits falling like a dropped deck.
+  // Confetti, card-club style: the four suits falling like a dropped deck.
   function suitRain(host) {
     const glyphs = ['♠', '♥', '♦', '♣'];
-    const colors = ['#f3ecd8', '#c4573b', '#7fa3b8', '#4f9e56'];
+    const colors = ['#a06ee8', '#ff5d5d', '#4aa3ff', '#3ec46d'];
     for (let i = 0; i < 44; i++) {
       const s = document.createElement('span');
       const g = Math.floor(Math.random() * 4);

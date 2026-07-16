@@ -105,7 +105,7 @@ const PreflopTrainer = (() => {
     fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
     const pct = rangePercent(range).toFixed(0);
     fb.innerHTML = `
-      <div class="fb-title">${correct ? '✓ Correct' : '✗ Not this time'} — ${current.code} is a ${shouldRaise ? 'RAISE' : 'FOLD'} from ${RFI_RANGES[current.pos].label}</div>
+      <div class="fb-title">${correct ? 'KAPOW! Nailed it' : 'WHOOPS! Not quite'} — ${current.code} is a ${shouldRaise ? 'RAISE' : 'FOLD'} from ${RFI_RANGES[current.pos].label}</div>
       <div class="fb-detail">The ${RFI_RANGES[current.pos].label} opening range is about ${pct}% of hands.
       ${shouldRaise ? 'This hand is inside it.' : 'This hand falls just outside it — folding saves money long-term.'}
       Check the Range Charts tab to study the full grid.</div>`;

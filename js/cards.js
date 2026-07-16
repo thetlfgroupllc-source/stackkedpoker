@@ -4,7 +4,7 @@
 const RANK_CHARS = '23456789TJQKA'; // index 0 => rank 2
 const SUIT_CHARS = 'shdc';
 const SUIT_GLYPHS = ['♠', '♥', '♦', '♣'];
-const SUIT_CLASS_COLORS = ['#26201a', '#c04434', '#33619e', '#2c7a50']; // four-color deck, vintage ink
+const SUIT_CLASS_COLORS = ['#2b2016', '#ff5d5d', '#4aa3ff', '#3ec46d']; // four-color deck, crayon box
 
 function rankChar(r) { return RANK_CHARS[r - 2]; }
 function rankName(r) {

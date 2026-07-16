@@ -90,7 +90,7 @@ const PushFoldTrainer = (() => {
     const fb = document.getElementById('phFeedback');
     fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
     fb.innerHTML = `
-      <div class="fb-title">${correct ? '✓ Correct' : '✗ Not this time'} — ${current.code} at ${current.bb}bb from ${current.pos} is a ${shouldPush ? 'JAM' : 'FOLD'}</div>
+      <div class="fb-title">${correct ? 'BOOM! Got it' : 'OOF! Not this one'} — ${current.code} at ${current.bb}bb from ${current.pos} is a ${shouldPush ? 'JAM' : 'FOLD'}</div>
       <div class="fb-detail">The jam range here is roughly the top ${pct}% of hands (highlighted in the grid).
       ${shouldPush ? 'Shoving picks up the blinds often enough — and you still have equity when called.' : 'Too weak to jam — when called you\'re in bad shape, and folding preserves your stack.'}</div>`;
     renderRangeGrid(document.getElementById('phGrid'), range, current.code);
