@@ -84,6 +84,7 @@ const PushFoldTrainer = (() => {
       stats.bestStreak = Math.max(stats.bestStreak, stats.streak);
     } else stats.streak = 0;
     saveStats();
+    Meta.award('drill', { correct, streak: stats.streak, source: 'pushfold' });
 
     const pct = rangePercent(range).toFixed(0);
     const fb = document.getElementById('phFeedback');

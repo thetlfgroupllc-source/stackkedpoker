@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('view-' + btn.dataset.view).classList.add('active');
+      if (btn.dataset.view === 'locker') Meta.renderLocker(); // XP may have moved since last visit
     });
   });
 
@@ -39,7 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     else if ((e.key === 'n' || e.key === 'Enter') && next) next.click();
   });
 
-  Tracker.init();       // first: others read its totals for the sidebar
+  Meta.init();          // player card + locker before anything awards XP
+  Tracker.init();       // others read its totals for the sidebar
   PreflopTrainer.init();
   PushFoldTrainer.init();
   OddsQuiz.init();

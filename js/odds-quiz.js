@@ -105,6 +105,7 @@ const OddsQuiz = (() => {
       stats.bestStreak = Math.max(stats.bestStreak, stats.streak);
     } else stats.streak = 0;
     saveStats();
+    Meta.award('drill', { correct, streak: stats.streak, source: 'odds' });
 
     const { tpl, onTurn, pot, bet, equity, required, shouldCall } = current;
     const eqPct = (equity * 100).toFixed(1);

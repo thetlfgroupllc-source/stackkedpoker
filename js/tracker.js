@@ -83,19 +83,19 @@ const Tracker = (() => {
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative profit across sessions">
         ${ticks.map(t => `
           <line x1="${PAD_L}" x2="${W - PAD_R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"
-            stroke="${t === 0 ? '#383835' : '#2c2c2a'}" stroke-width="${t === 0 ? 1.5 : 1}"/>
+            stroke="${t === 0 ? '#443d28' : '#35301f'}" stroke-width="${t === 0 ? 1.5 : 1}"/>
           <text x="${PAD_L - 8}" y="${(y(t) + 4).toFixed(1)}" text-anchor="end"
-            font-size="11" fill="#898781" style="font-variant-numeric:tabular-nums">${fmt$(t)}</text>`).join('')}
-        <path d="${path}" fill="none" stroke="#3987e5" stroke-width="2" stroke-linejoin="round"/>
+            font-size="11" fill="#948c74" style="font-variant-numeric:tabular-nums">${fmt$(t)}</text>`).join('')}
+        <path d="${path}" fill="none" stroke="#d9a441" stroke-width="2" stroke-linejoin="round"/>
         ${pts.map((p, i) => `
           <circle class="trk-pt" data-i="${i}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="3.5"
-            fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
+            fill="#d9a441" stroke="#1e1b13" stroke-width="2"/>
           <circle class="trk-hit" data-i="${i}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="12" fill="transparent"/>`).join('')}
-        <text x="${W - PAD_R}" y="${H - 8}" text-anchor="end" font-size="11" fill="#898781">sessions →</text>
+        <text x="${W - PAD_R}" y="${H - 8}" text-anchor="end" font-size="11" fill="#948c74">sessions →</text>
         <g id="trkTip" style="display:none;pointer-events:none">
-          <rect id="trkTipBg" rx="6" fill="#232322" stroke="rgba(255,255,255,0.14)"/>
-          <text id="trkTipT1" font-size="11" fill="#c3c2b7"></text>
-          <text id="trkTipT2" font-size="13" font-weight="700" fill="#ffffff"></text>
+          <rect id="trkTipBg" rx="6" fill="#292418" stroke="rgba(243,236,216,0.16)"/>
+          <text id="trkTipT1" font-size="11" fill="#cfc6ac"></text>
+          <text id="trkTipT2" font-size="13" font-weight="700" fill="#f3ecd8"></text>
         </g>
       </svg>`;
 
@@ -168,6 +168,11 @@ const Tracker = (() => {
       notes: document.getElementById('trkNotes').value.trim(),
     });
     save();
+    Meta.award('session', {
+      profit: profit(sessions[sessions.length - 1]),
+      count: sessions.length,
+      totalProfit: totalProfit(),
+    });
     document.getElementById('trkForm').reset();
     setDefaultDate();
     renderAll();

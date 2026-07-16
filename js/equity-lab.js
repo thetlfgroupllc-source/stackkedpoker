@@ -57,6 +57,7 @@ const EquityLab = (() => {
     setTimeout(() => {
       const res = runEquity(input.hero, input.villain, input.board, 20000);
       show(res);
+      Meta.award('lab', {});
       btn.disabled = false;
       btn.textContent = 'Run 20,000 hands';
     }, 30);

@@ -44,6 +44,7 @@ To push local changes the other way: `git add -A && git commit -m "..." && git p
 | Tab | What it trains |
 |---|---|
 | **Arcade** | The game mode: 20 rapid-fire questions (preflop, push/fold, pot odds) scored on accuracy + speed. **Daily Challenge** seeds the questions from the date, so every player worldwide gets the same 20 hands each day. After a run you get a share code — friends paste each other's codes to build a local friends leaderboard, and a percentile estimate shows where you land vs. the field. No accounts, no server. |
+| **The Locker** | Your player identity. Every drill, arcade run, equity-lab sim and logged session earns XP; XP climbs a 13-step rank ladder (Deck Wetter → GOAT of the Felt). Ranking up unlocks hand-drawn avatars — sixteen goofy card-room regulars like Ring-Ring the calling-station telephone and Toasty the burnt-out grinder. There's also a wall of 18 badges and a daily play streak. Your avatar rides along in arcade share codes, so it shows up on your friends' leaderboards. |
 | **Preflop Trainer** | 6-max open-raise decisions by position (100bb cash). Biased toward borderline hands — the ones that actually cost you money. |
 | **Push/Fold Trainer** | Tournament short-stack jamming (5–15bb), based on Nash push/fold approximations. |
 | **Pot Odds Quiz** | Draw vs. price decisions with exact equity math in every explanation. |
@@ -58,6 +59,15 @@ To push local changes the other way: `git add -A && git commit -m "..." && git p
 - **+25 streak bonus** on every correct answer from the 3rd in a row
 - Wrong or timed out: 0 pts and the streak resets
 - Leaderboards rank by score, ties broken by total time
+
+## XP (The Locker)
+
+- Correct drill answer: **+10 XP** (+15 bonus at every 5th streak answer); a wrong
+  answer still pays **+2** — showing up counts
+- Arcade run: **score ÷ 20** XP, plus **+50** for your first daily challenge of the day
+- Logging a session: **+40** · Equity Lab sim: **+5**
+- First activity of each calendar day: **+25** "fresh felt" bonus, which also feeds
+  the day-streak counter
 
 ## Keyboard shortcuts (in the trainers)
 

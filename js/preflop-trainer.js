@@ -99,6 +99,7 @@ const PreflopTrainer = (() => {
       stats.streak = 0;
     }
     saveStats();
+    Meta.award('drill', { correct, streak: stats.streak, source: 'preflop' });
 
     const fb = document.getElementById('pfFeedback');
     fb.className = 'feedback show ' + (correct ? 'correct' : 'wrong');

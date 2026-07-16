@@ -239,6 +239,7 @@ const Challenge = (() => {
       score: r.score, timeMs: Math.round(r.totalMs),
       acc: Math.round((r.correct / Q_COUNT) * 100),
     };
+    const firstDailyToday = r.mode === 'daily' && !data.daily[r.date];
     data.bests.push(entry);
     data.bests.sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
     data.bests = data.bests.slice(0, 10);
@@ -248,9 +249,16 @@ const Challenge = (() => {
     }
     save();
 
+    const gain = Meta.award('arcade', {
+      score: r.score, correct: r.correct, maxStreak: r.maxStreak,
+      mode: r.mode, avgMs: r.totalMs / Q_COUNT, firstDailyToday,
+    });
+
     document.getElementById('arcResMode').textContent =
       r.mode === 'daily' ? `Daily Challenge — ${r.date}` : 'Blitz';
     document.getElementById('arcResScore').textContent = r.score;
+    document.getElementById('arcResXP').innerHTML =
+      `+${gain.xp} XP${gain.notes.length ? ' <span class="arc-xp-notes">(' + gain.notes.join(' · ') + ')</span>' : ''}`;
     document.getElementById('arcResStats').innerHTML = `
       <div class="stat-cell"><div class="sc-val">${r.correct}/${Q_COUNT}</div><div class="sc-label">Correct</div></div>
       <div class="stat-cell"><div class="sc-val">${fmtTime(r.totalMs)}</div><div class="sc-label">Total time</div></div>
@@ -261,7 +269,7 @@ const Challenge = (() => {
     document.getElementById('arcPctFill').style.width = pct + '%';
     document.getElementById('arcPctText').textContent = `You beat an estimated ${pct}% of the field`;
 
-    document.getElementById('arcName').value = data.name;
+    document.getElementById('arcName').value = Meta.getName();
     updateShareCode(entry);
     document.getElementById('arcAgain').onclick = () => start(r.mode);
 
@@ -281,8 +289,10 @@ const Challenge = (() => {
   }
 
   // ---------- share codes ----------
+  // v1 codes stay decodable; `av` (avatar id) is a new optional field, so
+  // codes from older versions of the app simply show the card-back avatar.
   function encodeEntry(entry, name) {
-    const payload = { v: 1, n: name || 'Anon', d: entry.date, s: entry.score, t: entry.timeMs, a: entry.acc };
+    const payload = { v: 1, n: name || 'Anon', d: entry.date, s: entry.score, t: entry.timeMs, a: entry.acc, av: Meta.getAvatar() };
     return 'STK1.' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))))
       .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
@@ -294,12 +304,13 @@ const Challenge = (() => {
       const p = JSON.parse(decodeURIComponent(escape(atob(b64))));
       if (p.v !== 1 || typeof p.n !== 'string' || typeof p.s !== 'number' ||
           typeof p.t !== 'number' || typeof p.d !== 'string') return null;
-      return { name: p.n.slice(0, 16), date: p.d, score: Math.round(p.s), timeMs: Math.round(p.t), acc: p.a };
+      return { name: p.n.slice(0, 16), date: p.d, score: Math.round(p.s), timeMs: Math.round(p.t), acc: p.a,
+               av: typeof p.av === 'string' ? p.av.slice(0, 24) : '' };
     } catch (e) { return null; }
   }
 
   function updateShareCode(entry) {
-    const code = encodeEntry(entry, data.name);
+    const code = encodeEntry(entry, Meta.getName());
     document.getElementById('arcShareCode').textContent = code;
     document.getElementById('arcCopy').onclick = () => {
       const btn = document.getElementById('arcCopy');
@@ -308,11 +319,10 @@ const Challenge = (() => {
         navigator.clipboard.writeText(code).then(done, () => fallbackCopy(code, done));
       else fallbackCopy(code, done);
     };
-    // re-encode when the name changes
+    // re-encode when the name changes (the name lives in the Locker profile)
     document.getElementById('arcName').oninput = e => {
-      data.name = e.target.value.trim();
-      save();
-      document.getElementById('arcShareCode').textContent = encodeEntry(entry, data.name);
+      Meta.setName(e.target.value);
+      document.getElementById('arcShareCode').textContent = encodeEntry(entry, Meta.getName());
     };
   }
   function fallbackCopy(text, done) {
@@ -361,12 +371,14 @@ const Challenge = (() => {
 
     // friends board: your daily bests join the table, marked "you"
     const mine = Object.values(data.daily).map(e => ({
-      name: (data.name || 'You'), date: e.date, score: e.score, timeMs: e.timeMs, acc: e.acc, me: true,
+      name: (Meta.getName() || 'You'), date: e.date, score: e.score, timeMs: e.timeMs, acc: e.acc,
+      av: Meta.getAvatar(), me: true,
     }));
     const all = data.friends.concat(mine).sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
     const todays = all.filter(e => e.date === today);
     const board = rows => `<table class="arc-lb">${rows.map((e, i) => `
       <tr class="${e.me ? 'me' : ''}"><td class="lb-rank">${i + 1}</td>
+      <td class="lb-av"><span class="avatar-frame mini">${avatarSVG(e.av)}</span></td>
       <td>${escapeArc(e.name)}${e.me ? ' ★' : ''}</td>
       <td class="lb-score">${e.score}</td>
       <td>${fmtTime(e.timeMs)}</td><td>${e.date === 'blitz' ? 'blitz' : e.date}</td></tr>`).join('')}</table>`;
