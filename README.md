@@ -86,3 +86,10 @@ To push local changes the other way: `git add -A && git commit -m "..." && git p
 
 Quiz stats and sessions persist per browser. "Reset stats" in each trainer
 clears just that module.
+
+## Fonts
+
+The UI uses two self-hosted typefaces in `fonts/` (no CDN, works offline):
+[Baloo 2](https://fonts.google.com/specimen/Baloo+2) and
+[Lilita One](https://fonts.google.com/specimen/Lilita+One), both under the
+SIL Open Font License.
