@@ -178,7 +178,8 @@ const Meta = (() => {
       m.c.arcadeRuns++;
       if (p.mode === 'daily') m.c.dailyRuns++;
       xp += Math.round((p.score || 0) / 20);
-      if (p.firstDailyToday) { xp += 50; notes.push('first daily of the day'); }
+      if (p.firstDailyToday) { xp += 50; notes.push('first Showdown of the day'); }
+      if (p.firstWeeklyOfWeek) { xp += 50; notes.push('first Grand Prix of the week'); }
     } else if (type === 'session') {
       m.c.sessions++;
       xp += 40;
@@ -270,7 +271,7 @@ const Meta = (() => {
   // Confetti, card-club style: the four suits falling like a dropped deck.
   function suitRain(host) {
     const glyphs = ['♠', '♥', '♦', '♣'];
-    const colors = ['#a06ee8', '#ff5d5d', '#4aa3ff', '#3ec46d'];
+    const colors = ['#ffd21f', '#ff2f8e', '#00cfe0', '#47e49a'];
     for (let i = 0; i < 44; i++) {
       const s = document.createElement('span');
       const g = Math.floor(Math.random() * 4);

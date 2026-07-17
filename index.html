@@ -19,15 +19,19 @@
     </div>
     <div class="player-card" id="playerCard"></div>
     <nav class="nav">
-      <button class="nav-btn active" data-view="arcade">Arcade <span class="nav-tag">game</span></button>
+      <div class="nav-group">Compete</div>
+      <button class="nav-btn active" data-view="arcade">Challenge HQ <span class="nav-tag">live</span></button>
       <button class="nav-btn" data-view="locker">The Locker <span class="nav-tag">you</span></button>
+      <div class="nav-group">Train</div>
       <button class="nav-btn" data-view="preflop">Preflop Trainer <span class="nav-tag">cash</span></button>
       <button class="nav-btn" data-view="pushfold">Push/Fold Trainer <span class="nav-tag">mtt</span></button>
       <button class="nav-btn" data-view="odds">Pot Odds Quiz</button>
+      <div class="nav-group">Study</div>
       <button class="nav-btn" data-view="equity">Equity Lab</button>
       <button class="nav-btn" data-view="ranges">Range Charts</button>
-      <button class="nav-btn" data-view="tracker">Session Tracker</button>
       <button class="nav-btn" data-view="cheatsheet">Cheat Sheet</button>
+      <div class="nav-group">Track</div>
+      <button class="nav-btn" data-view="tracker">Session Tracker</button>
     </nav>
     <div class="sidebar-foot" id="sidebarStats"></div>
   </aside>
@@ -37,27 +41,40 @@
     <!-- ============ ARCADE ============ -->
     <section class="view active" id="view-arcade">
       <header class="view-head">
-        <h1>Arcade</h1>
-        <p>Twenty lightning-round poker puzzles — snap decisions, silly speed, big points. Beat the clock, beat your friends, beat yesterday's you.</p>
+        <h1>Challenge HQ</h1>
+        <p>The competition floor! A fresh showdown every day, a Grand Prix every week, and a season-long points race for the podium. Everybody gets the same puzzles — winning is up to you.</p>
       </header>
 
       <!-- home -->
       <div id="arcHome">
-        <div class="arc-modes">
+        <div class="arc-modes three">
           <div class="arc-mode-card daily">
-            <div class="amc-tag">Daily Challenge</div>
-            <h3 id="arcDailyTitle">Today's 20 hands</h3>
-            <p>Everyone in the whole world gets the <b>same 20 puzzles today</b>. Same test, fair fight — may the best goofball win.</p>
+            <div class="amc-tag">Daily Showdown</div>
+            <h3 id="arcDailyTitle">Today's 20 puzzles</h3>
+            <p>Everyone in the whole world gets the <b>same 20 puzzles today</b>. Your best score feeds the season race!</p>
             <button class="btn btn-raise" id="arcPlayDaily">Deal me in!</button>
             <div class="amc-best" id="arcDailyBest"></div>
+          </div>
+          <div class="arc-mode-card weekly">
+            <div class="amc-tag">Weekly Grand Prix</div>
+            <h3 id="arcWeeklyTitle">This week's 20</h3>
+            <p>One set of puzzles for the <b>whole week</b> — retry as much as you like, only your best run counts. Glory resets Monday.</p>
+            <button class="btn btn-grand" id="arcPlayWeekly">Race it!</button>
+            <div class="amc-best" id="arcWeeklyBest"></div>
           </div>
           <div class="arc-mode-card">
             <div class="amc-tag">Blitz</div>
             <h3>Random 20</h3>
-            <p>A brand-new scramble of 20 every single time. Warm up those clicking fingers and chase a perfect run.</p>
+            <p>Practice mode — a brand-new scramble every time. Warm up those clicking fingers before the real events.</p>
             <button class="btn btn-next" style="margin:0" id="arcPlayBlitz">Surprise me!</button>
             <div class="amc-best" id="arcBlitzBest"></div>
           </div>
+        </div>
+        <div class="panel">
+          <h3>Season podium — <span id="arcSeasonLabel"></span></h3>
+          <p class="arc-hint">Every Daily Showdown best you post this month adds to your season total. Friends join the race when you paste their codes below.</p>
+          <div class="podium" id="arcPodium"></div>
+          <div id="arcSeason"></div>
         </div>
         <div class="two-col">
           <div class="panel">
@@ -65,10 +82,10 @@
             <div id="arcBests"></div>
           </div>
           <div class="panel">
-            <h3>Friends leaderboard</h3>
-            <p class="arc-hint">After a run you get a share code. Swap codes with friends and paste theirs here — no accounts, nothing leaves your machine.</p>
+            <h3>Rival codes</h3>
+            <p class="arc-hint">After a run you get a share code. Swap codes with your rivals and paste theirs here — no accounts, nothing leaves your machine.</p>
             <div class="arc-addcode">
-              <input type="text" id="arcCodeIn" placeholder="Paste a friend's code (STK1.…)">
+              <input type="text" id="arcCodeIn" placeholder="Paste a rival's code (STK1.…)">
               <button class="btn btn-next" style="margin:0;flex:0 0 auto" id="arcCodeAdd">Add</button>
             </div>
             <div class="arc-code-err" id="arcCodeErr"></div>

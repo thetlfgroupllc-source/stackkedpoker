@@ -8,7 +8,7 @@ const Challenge = (() => {
   const Q_COUNT = 20;
   const Q_TIME = 15000; // ms per question
 
-  let data = load();      // {name, bests: [], friends: [], daily: {date: entry}}
+  let data = load();      // {name, bests: [], friends: [], daily: {date: entry}, weekly: {week: entry}}
   let run = null;
   let timerInt = null;
   let qStart = 0;
@@ -16,9 +16,12 @@ const Challenge = (() => {
   function load() {
     try {
       const d = JSON.parse(localStorage.getItem(STORE));
-      if (d && Array.isArray(d.bests)) return d;
+      if (d && Array.isArray(d.bests)) {
+        if (!d.weekly) d.weekly = {}; // added with the Grand Prix mode
+        return d;
+      }
     } catch (e) { /* fall through */ }
-    return { name: '', bests: [], friends: [], daily: {} };
+    return { name: '', bests: [], friends: [], daily: {}, weekly: {} };
   }
   function save() { localStorage.setItem(STORE, JSON.stringify(data)); }
 
@@ -42,6 +45,15 @@ const Challenge = (() => {
   function todayStr() {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  // ISO week key like "2026-W29" — the Grand Prix runs Monday to Sunday
+  function weekKey(d = new Date()) {
+    const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const day = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - day);
+    const y = t.getUTCFullYear();
+    const week = Math.ceil((((t - Date.UTC(y, 0, 1)) / 86400000) + 1) / 7);
+    return y + '-W' + String(week).padStart(2, '0');
   }
 
   // ---------- question builders ----------
@@ -129,8 +141,8 @@ const Challenge = (() => {
   // ---------- game flow ----------
   function start(mode) {
     const date = todayStr();
-    const seed = mode === 'daily'
-      ? hashStr('stacked-daily-' + date)
+    const seed = mode === 'daily' ? hashStr('stacked-daily-' + date)
+      : mode === 'weekly' ? hashStr('stacked-weekly-' + weekKey())
       : hashStr('blitz-' + Math.random());
     run = {
       mode, date, qs: buildQuestions(mulberry32(seed)),
@@ -235,12 +247,14 @@ const Challenge = (() => {
     clearInterval(timerInt);
     const r = run;
     run = null;
+    const wk = weekKey();
     const entry = {
-      mode: r.mode, date: r.mode === 'daily' ? r.date : 'blitz',
+      mode: r.mode, date: r.mode === 'daily' ? r.date : r.mode === 'weekly' ? wk : 'blitz',
       score: r.score, timeMs: Math.round(r.totalMs),
       acc: Math.round((r.correct / Q_COUNT) * 100),
     };
     const firstDailyToday = r.mode === 'daily' && !data.daily[r.date];
+    const firstWeeklyOfWeek = r.mode === 'weekly' && !data.weekly[wk];
     data.bests.push(entry);
     data.bests.sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
     data.bests = data.bests.slice(0, 10);
@@ -248,15 +262,20 @@ const Challenge = (() => {
       const prev = data.daily[r.date];
       if (!prev || entry.score > prev.score) data.daily[r.date] = entry;
     }
+    if (r.mode === 'weekly') {
+      const prev = data.weekly[wk];
+      if (!prev || entry.score > prev.score) data.weekly[wk] = entry;
+    }
     save();
 
     const gain = Meta.award('arcade', {
       score: r.score, correct: r.correct, maxStreak: r.maxStreak,
-      mode: r.mode, avgMs: r.totalMs / Q_COUNT, firstDailyToday,
+      mode: r.mode, avgMs: r.totalMs / Q_COUNT, firstDailyToday, firstWeeklyOfWeek,
     });
 
     document.getElementById('arcResMode').textContent =
-      r.mode === 'daily' ? `Daily Challenge — ${r.date}` : 'Blitz';
+      r.mode === 'daily' ? `Daily Showdown — ${r.date}`
+      : r.mode === 'weekly' ? `Weekly Grand Prix — ${wk}` : 'Blitz';
     document.getElementById('arcResScore').textContent = r.score;
     document.getElementById('arcResXP').innerHTML =
       `+${gain.xp} XP${gain.notes.length ? ' <span class="arc-xp-notes">(' + gain.notes.join(' · ') + ')</span>' : ''}`;
@@ -354,10 +373,15 @@ const Challenge = (() => {
   // ---------- home rendering ----------
   function renderHome() {
     const today = todayStr();
-    document.getElementById('arcDailyTitle').textContent = `Today's 20 hands — ${today}`;
+    const wk = weekKey();
+    document.getElementById('arcDailyTitle').textContent = `Today's 20 puzzles — ${today}`;
     const db = data.daily[today];
     document.getElementById('arcDailyBest').textContent =
       db ? `Your best today: ${db.score} pts · ${fmtTime(db.timeMs)} · ${db.acc}% correct` : 'Not played yet today.';
+    document.getElementById('arcWeeklyTitle').textContent = `This week's 20 — ${wk}`;
+    const wb = data.weekly[wk];
+    document.getElementById('arcWeeklyBest').textContent =
+      wb ? `Your best this week: ${wb.score} pts · ${wb.acc}% correct` : 'No Grand Prix run yet this week.';
     const bb = data.bests.filter(b => b.mode === 'blitz')[0];
     document.getElementById('arcBlitzBest').textContent =
       bb ? `Blitz best: ${bb.score} pts · ${bb.acc}% correct` : 'No blitz runs yet.';
@@ -365,18 +389,20 @@ const Challenge = (() => {
     document.getElementById('arcBests').innerHTML = data.bests.length
       ? `<table class="arc-lb">${data.bests.map((b, i) => `
           <tr><td class="lb-rank">${i + 1}</td>
-          <td>${b.mode === 'daily' ? b.date : 'Blitz'}</td>
+          <td>${b.mode === 'blitz' ? 'Blitz' : b.mode === 'weekly' ? 'GP ' + b.date : b.date}</td>
           <td class="lb-score">${b.score}</td>
           <td>${fmtTime(b.timeMs)}</td><td>${b.acc}%</td></tr>`).join('')}</table>`
       : '<div class="arc-hint">Play a run to set your first best.</div>';
 
-    // friends board: your daily bests join the table, marked "you"
-    const mine = Object.values(data.daily).map(e => ({
+    // rivals board: your daily + weekly bests join the table, marked "you"
+    const mineOf = obj => Object.values(obj).map(e => ({
       name: (Meta.getName() || 'You'), date: e.date, score: e.score, timeMs: e.timeMs, acc: e.acc,
       av: Meta.getAvatar(), me: true,
     }));
+    const mine = mineOf(data.daily).concat(mineOf(data.weekly));
     const all = data.friends.concat(mine).sort((a, b) => b.score - a.score || a.timeMs - b.timeMs);
     const todays = all.filter(e => e.date === today);
+    const weeks = all.filter(e => e.date === wk);
     const board = rows => `<table class="arc-lb">${rows.map((e, i) => `
       <tr class="${e.me ? 'me' : ''}"><td class="lb-rank">${i + 1}</td>
       <td class="lb-av"><span class="avatar-frame mini">${avatarSVG(e.av)}</span></td>
@@ -384,9 +410,62 @@ const Challenge = (() => {
       <td class="lb-score">${e.score}</td>
       <td>${fmtTime(e.timeMs)}</td><td>${e.date === 'blitz' ? 'blitz' : e.date}</td></tr>`).join('')}</table>`;
     document.getElementById('arcFriends').innerHTML =
-      (todays.length ? `<div class="arc-lb-label">Today's daily</div>${board(todays)}` : '') +
+      (todays.length ? `<div class="arc-lb-label">Today's Showdown</div>${board(todays)}` : '') +
+      (weeks.length ? `<div class="arc-lb-label">This week's Grand Prix</div>${board(weeks)}` : '') +
       (all.length ? `<div class="arc-lb-label">All-time</div>${board(all.slice(0, 10))}`
-        : '<div class="arc-hint">No entries yet — play the daily and swap codes.</div>');
+        : '<div class="arc-hint">No entries yet — play the Daily Showdown and swap codes.</div>');
+
+    renderSeason(today);
+  }
+
+  // ---------- season race ----------
+  // A season is one calendar month. Every Daily Showdown best in that month
+  // adds to your total — yours from data.daily, rivals' from their pasted codes.
+  function renderSeason(today) {
+    const season = today.slice(0, 7); // YYYY-MM
+    const label = new Date(today + 'T12:00:00').toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    document.getElementById('arcSeasonLabel').textContent = label;
+
+    const inSeason = e => /^\d{4}-\d{2}-\d{2}$/.test(e.date) && e.date.startsWith(season);
+    const totals = new Map(); // name -> {name, av, me, pts, days}
+    const bump = (nameKey, e, av, me) => {
+      const t = totals.get(nameKey) || { name: nameKey, av, me, pts: 0, days: 0 };
+      t.pts += e.score;
+      t.days++;
+      if (me) { t.me = true; t.av = av; }
+      totals.set(nameKey, t);
+    };
+    for (const e of Object.values(data.daily)) if (inSeason(e)) bump(Meta.getName() || 'You', e, Meta.getAvatar(), true);
+    for (const e of data.friends) if (inSeason(e)) bump(e.name, e, e.av, false);
+
+    const standings = [...totals.values()].sort((a, b) => b.pts - a.pts || b.days - a.days);
+    const podiumEl = document.getElementById('arcPodium');
+    const listEl = document.getElementById('arcSeason');
+    if (!standings.length) {
+      podiumEl.innerHTML = '';
+      listEl.innerHTML = '<div class="arc-hint">The podium is empty — play today\'s Daily Showdown to open the race!</div>';
+      return;
+    }
+
+    // podium renders 2nd · 1st · 3rd, tallest block in the middle
+    const medals = ['first', 'second', 'third'];
+    const step = (t, i) => t ? `
+      <div class="podium-step ${medals[i]} ${t.me ? 'me' : ''}">
+        <div class="avatar-frame lg">${avatarSVG(t.av)}</div>
+        <div class="podium-name">${escapeArc(t.name)}${t.me ? ' ★' : ''}</div>
+        <div class="podium-pts">${t.pts} pts</div>
+        <div class="podium-block"><span>${i + 1}</span></div>
+      </div>` : '';
+    podiumEl.innerHTML = step(standings[1], 1) + step(standings[0], 0) + step(standings[2], 2);
+
+    listEl.innerHTML = standings.length > 3
+      ? `<table class="arc-lb">${standings.slice(3, 10).map((t, i) => `
+          <tr class="${t.me ? 'me' : ''}"><td class="lb-rank">${i + 4}</td>
+          <td class="lb-av"><span class="avatar-frame mini">${avatarSVG(t.av)}</span></td>
+          <td>${escapeArc(t.name)}${t.me ? ' ★' : ''}</td>
+          <td class="lb-score">${t.pts}</td>
+          <td>${t.days} day${t.days === 1 ? '' : 's'} played</td></tr>`).join('')}</table>`
+      : '';
   }
 
   function escapeArc(s) {
@@ -395,6 +474,7 @@ const Challenge = (() => {
 
   function init() {
     document.getElementById('arcPlayDaily').addEventListener('click', () => start('daily'));
+    document.getElementById('arcPlayWeekly').addEventListener('click', () => start('weekly'));
     document.getElementById('arcPlayBlitz').addEventListener('click', () => start('blitz'));
     document.getElementById('arcQuit').addEventListener('click', abandon);
     document.getElementById('arcHomeBtn').addEventListener('click', () => { showScreen('home'); renderHome(); });
